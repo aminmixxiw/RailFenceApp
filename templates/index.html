@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Rail Fence Cipher</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>🔐 Rail Fence Cipher</h1>
+        <form method="POST">
+            <label for="plaintext">Enter Plaintext:</label>
+            <textarea name="plaintext" id="plaintext" required>{{ request.form.plaintext or '' }}</textarea>
+
+            <label for="rails">Number of Rails:</label>
+            <input type="number" name="rails" id="rails" min="2" max="10" value="{{ request.form.rails or 3 }}" required>
+
+            <div class="form-row">
+                <button type="submit">Encrypt</button>
+                {% if rail_grid %}
+                    <button type="button" id="toggle-grid-btn" class="green-btn">Show Rail Fence Grid</button>
+                {% endif %}
+            </div>
+
+            <div class="result">
+                <h2>🔒 Encrypted Text:</h2>
+                <p>{{ encrypted_text or 'Encrypted text will appear here after you submit.' }}</p>
+            </div>
+        </form>
+
+        {% if rail_grid %}
+        <div class="grid-display" id="rail-grid" style="display: none;">
+            <h2>🧮 Rail Fence Grid:</h2>
+            <table class="fence-table">
+                {% for row in rail_grid %}
+                    <tr>
+                        {% for cell in row %}
+                            <td>{{ cell or '' }}</td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+    const toggleBtn = document.getElementById('toggle-grid-btn');
+    const grid = document.getElementById('rail-grid');
+
+    toggleBtn?.addEventListener('click', function () {
+        if (grid.style.display === 'none' || grid.style.display === '') {
+            grid.style.display = 'block';
+            this.textContent = 'Hide Rail Fence Grid';
+            this.classList.remove('green-btn');
+            this.classList.add('red-btn');
+        } else {
+            grid.style.display = 'none';
+            this.textContent = 'Show Rail Fence Grid';
+            this.classList.remove('red-btn');
+            this.classList.add('green-btn');
+        }
+    });
+    </script>
+</body>
+</html>
