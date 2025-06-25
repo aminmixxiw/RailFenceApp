@@ -38,8 +38,8 @@ def rail_fence_decrypt(ciphertext, rails):
         return ciphertext
 
 #Generate the zigzag pattern of rail indexes to determine the order of character placement
-    pattern = list(range(rails)) + list(range(rails - 2, 0, -1))
-    indexes = pattern * ((len(ciphertext) // len(pattern)) + 1)
+    pattern = list(range(rails)) + list(range(rails - 2, 0, -1)) #Dptkan pattern dia semula
+    indexes = pattern * ((len(ciphertext) // len(pattern)) + 1) #Make the zigzag pattern long enough to match the number of letters in the ciphertext.
     indexes = indexes[:len(ciphertext)]
 
 #Count how many characters go into each rail and prepare empty lists to hold them
@@ -53,7 +53,7 @@ def rail_fence_decrypt(ciphertext, rails):
             zigzag[r].append(ciphertext[i])
             i += 1
 
-#Reconstruct the original text by reading characters from each rail in zigzag order
+#Build back the original text by taking letters from each rail in zigzag order - for decrypt
     rail_indices = [0] * rails
     result = []
     for r in indexes:
@@ -74,7 +74,7 @@ def clear_history():
     session['history'] = []
     return redirect(url_for('index'))
 
-#set defaults for output, grid, history, mode, and language
+#Set defaults for output, grid, history, mode, and language
 @app.route('/', methods=['GET', 'POST'])
 def index():
     encrypted_text = ''
@@ -102,5 +102,6 @@ def index():
                            mode=mode,
                            lang=lang)
 
+#To start the app
 if __name__ == '__main__':
     app.run(debug=True)
