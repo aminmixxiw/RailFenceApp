@@ -10,13 +10,12 @@ body {
 }
 
 .container {
-    max-width: 700px;
+    max-width: 1100px;
     margin: 40px auto;
     background-color: rgba(255, 255, 255, 0.95);
     padding: 30px;
     border-radius: 16px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-    box-sizing: border-box;
 }
 
 h1 {
@@ -32,7 +31,8 @@ label {
 }
 
 textarea,
-input[type="number"] {
+input[type="number"],
+select {
     width: 100%;
     padding: 12px;
     border-radius: 8px;
@@ -66,16 +66,13 @@ button[type="submit"] {
     background-color: #2ecc71;
     color: white;
 }
-
 .green-btn:hover {
     background-color: #27ae60;
 }
-
 .red-btn {
     background-color: #e74c3c;
     color: white;
 }
-
 .red-btn:hover {
     background-color: #c0392b;
 }
@@ -84,21 +81,17 @@ button[type="submit"] {
     background-color: white;
     padding: 15px 20px;
     border-radius: 12px;
-    color: #000;
-    min-height: 100px;
     margin-top: 30px;
-    box-sizing: border-box;
 }
 
 .result h2 {
     font-size: 1.2rem;
-    font-weight: normal;
     margin-bottom: 12px;
     color: black;
 }
 
 .result p {
-    font-size: 24px;
+    font-size: 20px;
     font-weight: bold;
     color: #000;
     margin: 0;
@@ -109,24 +102,74 @@ button[type="submit"] {
     margin-top: 30px;
 }
 
-.grid-display h2 {
-    font-size: 1.2rem;
-    margin-bottom: 12px;
-    color: black;
-}
-
 .fence-table {
     width: 100%;
     border-collapse: collapse;
     table-layout: fixed;
 }
-
 .fence-table td {
     border: 1px solid #999;
     padding: 10px;
     text-align: center;
-    font-size: 20px;
-    font-weight: bold;
+    font-size: 16px;
     color: black;
     height: 40px;
+}
+
+.language-selector-top {
+    position: absolute;
+    top: 10px;
+    left: 20px;
+    z-index: 1000;
+    background-color: #ffffffdd;
+    padding: 4px 9px;
+    border-radius: 8px;
+    font-size: 14px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.language-selector-top select {
+    padding: 4px 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+    cursor: pointer;
+}
+
+.split-layout {
+    display: flex;
+    gap: 30px;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+.left-column {
+    flex: 1;
+    min-width: 300px;
+}
+
+.right-column {
+    flex: 1;
+    min-width: 300px;
+}
+
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: auto;
+    font-size: 14px;
+}
+
+.history-table th,
+.history-table td {
+    border: 1px solid #999;
+    padding: 8px;
+    text-align: left;
+    word-break: break-word;
+}
+
+.no-history-msg {
+    font-style: italic;
+    color: #777;
 }

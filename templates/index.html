@@ -6,61 +6,158 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
+    <div class="language-selector-top">
+        <form method="POST" action="/set_language">
+            <label for="lang-select">
+                {% if lang == 'en' %}Choose Language:{% else %}Pilih Bahasa:{% endif %}
+            </label>
+            <select name="lang" id="lang-select" onchange="this.form.submit()">
+                <option value="en" {% if lang == 'en' %}selected{% endif %}>English</option>
+                <option value="bm" {% if lang == 'bm' %}selected{% endif %}>Bahasa Melayu</option>
+            </select>
+        </form>
+    </div>
+
     <div class="container">
         <h1>🔐 Rail Fence Cipher</h1>
-        <form method="POST">
-            <label for="plaintext">Enter Plaintext:</label>
-            <textarea name="plaintext" id="plaintext" required>{{ request.form.plaintext or '' }}</textarea>
 
-            <label for="rails">Number of Rails:</label>
-            <input type="number" name="rails" id="rails" min="2" max="10" value="{{ request.form.rails or 3 }}" required>
+        <div class="split-layout">
+            <!-- Left Column (Form) -->
+            <div class="left-column">
+                <form method="POST">
+                    <label for="plaintext">
+                        {% if lang == 'bm' %}Masukkan Teks:{% else %}Enter Text:{% endif %}
+                    </label>
+                    <textarea name="plaintext" id="plaintext" required>{{ request.form.plaintext or '' }}</textarea>
 
-            <div class="form-row">
-                <button type="submit">Encrypt</button>
-                {% if rail_grid %}
-                    <button type="button" id="toggle-grid-btn" class="green-btn">Show Rail Fence Grid</button>
-                {% endif %}
+                    <label for="rails">
+                        {% if lang == 'bm' %}Bilangan Rel:{% else %}Number of Rails:{% endif %}
+                    </label>
+                    <input type="number" name="rails" id="rails" min="2" max="10" value="{{ request.form.rails or 3 }}" required>
+
+                    <label for="mode">
+                        {% if lang == 'bm' %}Mod:{% else %}Mode:{% endif %}
+                    </label>
+                    <select name="mode" id="mode">
+                        <option value="encrypt" {% if mode == 'encrypt' %}selected{% endif %}>
+                            {% if lang == 'bm' %}Enkripsi{% else %}Encrypt{% endif %}
+                        </option>
+                        <option value="decrypt" {% if mode == 'decrypt' %}selected{% endif %}>
+                            {% if lang == 'bm' %}Dekripsi{% else %}Decrypt{% endif %}
+                        </option>
+                    </select>
+
+                    <div class="form-row">
+                        <button type="submit">
+                            {% if lang == 'bm' %}Jalankan{% else %}Run{% endif %}
+                        </button>
+                        {% if rail_grid and mode == 'encrypt' %}
+                        <button type="button" id="toggle-grid-btn" class="green-btn">
+                            {% if lang == 'bm' %}Tunjuk Grid Rel{% else %}Show Rail Fence Grid{% endif %}
+                        </button>
+                        {% endif %}
+                    </div>
+
+                    <div class="result">
+                        <h2>{% if lang == 'bm' %}🧾 Teks Output:{% else %}🧾 Output Text:{% endif %}</h2>
+                        <p>{{ encrypted_text or ( 'Hasil akan dipaparkan di sini.' if lang == 'bm' else 'Result will appear here.' ) }}</p>
+
+                        {% if encrypted_text %}
+                        <div class="form-row">
+                            <button type="button" class="green-btn" onclick="copyText()">
+                                {% if lang == 'bm' %}Salin{% else %}Copy{% endif %}
+                            </button>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    {% if rail_grid and mode == 'encrypt' %}
+                    <div class="grid-display" id="rail-grid" style="display: none;">
+                        <h2>{% if lang == 'bm' %}🧮 Grid Rail Fence:{% else %}🧮 Rail Fence Grid:{% endif %}</h2>
+                        <table class="fence-table">
+                            {% for row in rail_grid %}
+                            <tr>
+                                {% for cell in row %}
+                                <td>{{ cell or '' }}</td>
+                                {% endfor %}
+                            </tr>
+                            {% endfor %}
+                        </table>
+                    </div>
+                    {% endif %}
+                </form>
             </div>
 
-            <div class="result">
-                <h2>🔒 Encrypted Text:</h2>
-                <p>{{ encrypted_text or 'Encrypted text will appear here after you submit.' }}</p>
-            </div>
-        </form>
+            <!-- Right Column (History) -->
+            <div class="right-column">
+                <div class="history-section">
+                    <h2>{% if lang == 'bm' %}📜 Sejarah:{% else %}📜 History:{% endif %}</h2>
+                    {% if history %}
+                        <table class="history-table">
+                            <thead>
+                                <tr>
+                                    <th>{% if lang == 'bm' %}Mod{% else %}Mode{% endif %}</th>
+                                    <th>{% if lang == 'bm' %}Input{% else %}Input{% endif %}</th>
+                                    <th>{% if lang == 'bm' %}Hasil{% else %}Output{% endif %}</th>
+                                    <th>{% if lang == 'bm' %}Rel{% else %}Rails{% endif %}</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in history %}
+                                <tr>
+                                    <td>
+    {% if lang == 'bm' %}
+        {{ 'Enkripsi' if item.mode == 'encrypt' else 'Dekripsi' }}
+    {% else %}
+        {{ 'Encrypt' if item.mode == 'encrypt' else 'Decrypt' }}
+    {% endif %}
+</td>
 
-        {% if rail_grid %}
-        <div class="grid-display" id="rail-grid" style="display: none;">
-            <h2>🧮 Rail Fence Grid:</h2>
-            <table class="fence-table">
-                {% for row in rail_grid %}
-                    <tr>
-                        {% for cell in row %}
-                            <td>{{ cell or '' }}</td>
-                        {% endfor %}
-                    </tr>
-                {% endfor %}
-            </table>
+                                    <td>{{ item.text }}</td>
+                                    <td>{{ item.result }}</td>
+                                    <td>{{ item.rails }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        <form method="POST" action="/clear_history">
+                            <button type="submit" class="red-btn" style="margin-top: 12px;">
+                                {% if lang == 'bm' %}Padam Sejarah{% else %}Clear History{% endif %}
+                            </button>
+                        </form>
+                    {% else %}
+                        <p class="no-history-msg">
+                            {% if lang == 'bm' %}Tiada sejarah lagi.{% else %}No history yet.{% endif %}
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
         </div>
-        {% endif %}
     </div>
 
     <script>
-    const toggleBtn = document.getElementById('toggle-grid-btn');
-    const grid = document.getElementById('rail-grid');
+        const toggleBtn = document.getElementById('toggle-grid-btn');
+        const grid = document.getElementById('rail-grid');
+        toggleBtn?.addEventListener('click', function () {
+            if (grid.style.display === 'none' || grid.style.display === '') {
+                grid.style.display = 'block';
+                this.textContent = '{{ "Sembunyi Grid Rel" if lang == "bm" else "Hide Rail Fence Grid" }}';
+                this.classList.remove('green-btn');
+                this.classList.add('red-btn');
+            } else {
+                grid.style.display = 'none';
+                this.textContent = '{{ "Tunjuk Grid Rel" if lang == "bm" else "Show Rail Fence Grid" }}';
+                this.classList.remove('red-btn');
+                this.classList.add('green-btn');
+            }
+        });
 
-    toggleBtn?.addEventListener('click', function () {
-        if (grid.style.display === 'none' || grid.style.display === '') {
-            grid.style.display = 'block';
-            this.textContent = 'Hide Rail Fence Grid';
-            this.classList.remove('green-btn');
-            this.classList.add('red-btn');
-        } else {
-            grid.style.display = 'none';
-            this.textContent = 'Show Rail Fence Grid';
-            this.classList.remove('red-btn');
-            this.classList.add('green-btn');
+        function copyText() {
+            const text = `{{ encrypted_text }}`;
+            navigator.clipboard.writeText(text).then(() => {
+                alert("{{ 'Teks disalin ke papan klip!' if lang == 'bm' else 'Text copied to clipboard!' }}");
+            });
         }
-    });
     </script>
 </body>
 </html>
