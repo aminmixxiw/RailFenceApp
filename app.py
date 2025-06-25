@@ -75,7 +75,7 @@ def index():
             encrypted_text = rail_fence_decrypt(text, rails)
 
         history.insert(0, {'mode': mode, 'text': text, 'rails': rails, 'result': encrypted_text})
-        session['history'] = history[:5]
+        session['history'] = history[:8]
 
     return render_template('index.html',
                            encrypted_text=encrypted_text,
